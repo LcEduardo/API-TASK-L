@@ -6,10 +6,21 @@ $user = 'postgres';
 $pass = 'postgres';
 
 try {
-    $db = new PDO('pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $dbName, $user, $pass);
-    echo "Connected successfully!";
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ];
+
+    $db = new PDO('pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $dbName, $user, $pass,$options);
+    //echo "Connected successfully!";
 }catch(Exception $e) {
-    echo 'Code: ' . $e->getCode() . "\nFile: " . $e->getFile() . "\nMessage: " . $e->getMessage();
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'error' => 'Database connection failed',
+        'code' => $e->getCode(),
+        'message' => $e->getMessage()
+    ]);
+    exit;
 }
 
 ?>
