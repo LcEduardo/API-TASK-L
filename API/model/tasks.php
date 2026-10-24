@@ -1,9 +1,17 @@
 <?php
 
-require __DIR__ . "/../config/database.php";
+class Task {
+    private PDO $conn;
 
-function getTaskById($id, $db){
-        $stmt = $db->prepare("SELECT * FROM tasks WHERE id = :id");
+    public function __construct(PDO $conn) {
+        $this->conn = $conn;
+    }
+
+    public function getTaskById($id) {
+        $stmt = $this->conn->prepare("
+            SELECT * FROM tasks WHERE id = :id;
+        ");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
-    } 
+    }
+}

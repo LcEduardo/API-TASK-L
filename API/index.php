@@ -7,19 +7,17 @@ header('Content-Type: application/json');
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        $task_id = getTaskById($_GET['id'], $db);
-        echo json_encode($task_id);
+        $task_id = new Task($db);
+        echo json_encode($task_id->getTaskById($_GET['id']));
         break;
     case 'POST':
-        $task_id = getTaskById($_POST['id'], $db);
-        echo json_encode($task_id);
+        $task_id = new Task($db);
+        echo json_encode($task_id->getTaskById($_POST['id']));
         break;
     default:
-        echo "Deu ruim!";    
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'error' => 'Method don\'t found'
+        ]);    
 }
-
-// function getTaskById($id, $db){
-//     $stmt = $db->prepare("SELECT * FROM tasks WHERE id = :id");
-//     $stmt->execute(['id' => $id]);
-//     return $stmt->fetch(PDO::FETCH_ASSOC);
-// } 
