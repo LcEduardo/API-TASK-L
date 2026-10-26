@@ -8,15 +8,38 @@ $TaskModel = new Task($db);
 $controllerTask = new ControllerTask($TaskModel);
 
 header('Content-Type: application/json');
+http_response_code(400);
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        $response = $controllerTask->getTask($_GET['id']);
-        echo json_encode($response['task']);
+        $id = $_GET['id'] ?? null;
+        $response = [];
+
+        if ($id == null){
+            http_response_code();
+            echo json_encode($response = [
+                'message' => 'ID not provided',
+            ]);
+            break;
+        }
+
+        $response = $controllerTask->getTask($id);
+        echo json_encode($response['message']);
         break;
     case 'POST':
+        $id = $_POST['id'] ?? null;
+        $response = [];
+
+        if ($id == null){
+            http_response_code();
+            echo json_encode($response = [
+                'message' => 'ID not provided',
+            ]);
+            break;
+        }       
+
         $response = $controllerTask->getTask($_POST['id']);
-        echo json_encode($response['task']);
+        echo json_encode($response['message']);
         break;
     default:
         http_response_code(405); //lado do cliente não do servidor por isso não pode ser 500

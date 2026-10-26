@@ -12,16 +12,14 @@ class ControllerTask
         $response = [];
         $task = $this->task->getTaskById($id);
 
-        if ($task == false) {
+        if (!$task) {
             return $response = [
                 "message" => "The id is valid, but no task has it",
-                "status" => http_response_code(404),
             ];
         }
-
+        http_response_code(200);
         return $response = [
-            "task" => $task,
-            "status" => http_response_code(200),
+            "message" => $task,
         ];
     }
 }
