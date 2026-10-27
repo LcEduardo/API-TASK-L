@@ -9,17 +9,24 @@ class ControllerTask
     }
 
     public function getTask($id) {
-        $response = [];
-        $task = $this->task->getTaskById($id);
+        try {
+            $task = $this->task->getTaskById($id);
 
-        if (!$task) {
-            return $response = [
-                "message" => "The id is valid, but no task has it",
+        }catch(PDOException $e) {
+            return [
+                "status" => 500,
+                "body" => ['error' => 'Database error'],
+            ];
+        }catch(Exception $e) {
+            return [
+                "status" => $e->getCode(),
+                "body" => ['error' => $e->getMessage()],
             ];
         }
-        http_response_code(200);
-        return $response = [
-            "message" => $task,
+
+        return [
+            "status" => 200,
+            "body" => $task,
         ];
     }
 }

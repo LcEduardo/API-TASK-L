@@ -8,18 +8,18 @@ class Task {
     }
 
     public function getTaskById($id) {
-        try {
-            $stmt = $this->conn->prepare("
-                SELECT * FROM tasks WHERE id = :id;
-            ");
 
-            $stmt->execute(['id' => $id]);
+        $stmt = $this->conn->prepare("
+            SELECT * FROM tasks WHERE id = :id;
+        ");
+        $stmt->execute(['id' => $id]);
+        $task = $stmt->fetch(PDO::FETCH_ASSOC);
             
-        }catch(PDOException $e) {
-            return $response
+        if ($task === false) {
+            throw new Exception("Task with id $id not found", 404);
         }
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $task;
         
     }
 }

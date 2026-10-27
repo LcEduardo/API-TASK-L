@@ -24,7 +24,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
         }
 
         $response = $controllerTask->getTask($id);
-        echo json_encode($response['message']);
+        http_response_code($response['status']);
+        echo json_encode($response['body']);
         break;
     case 'POST':
         $id = $_POST['id'] ?? null;
@@ -39,7 +40,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
         }       
 
         $response = $controllerTask->getTask($_POST['id']);
-        echo json_encode($response['message']);
+        http_response_code($response['status']);
+        echo json_encode($response['body']);
         break;
     default:
         http_response_code(405); //lado do cliente não do servidor por isso não pode ser 500
