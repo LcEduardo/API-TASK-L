@@ -2,23 +2,35 @@
 
 require __DIR__ . "/config/database.php";
 require __DIR__ . "/controller/ControllerTask.php";
+require __DIR__ . "/controller/ControllerWorker.php";
 require __DIR__ . "/model/Tasks.php";
+require __DIR__ . "/model/Workers.php";
 
-$TaskModel = new Task($db);
-$controllerTask = new ControllerTask($TaskModel);
+$Task = new Task($db);
+$controllerTask = new ControllerTask($Task);
+
+$Worker = new Worker($db);
+$controllerWorker = new ControllerWorker($Worker);
 
 header('Content-Type: application/json');
-http_response_code(400);
 
-switch ($_SERVER['REQUEST_METHOD']) {
-    case 'GET':
-        $id = $_GET['id'] ?? null;
-        $response = [];
+$base = dirname($_SERVER['SCRIPT_NAME']); // "/API" (pasta onde está o index.php)
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // /API/tasks/1
+$path = substr($path, strlen($base)); // /tasks/1
+$segments = explode('/', trim($path, '/'));  // ["tasks"] ou ["tasks", "1"]
+$resource = $segments[0]; // "tasks"
+
+$url = $_SERVER['REQUEST_METHOD'] . ' ' . $resource;
+
+
+switch ($url) {
+    case 'GET tasks':
+        $id = $segments[1] ?? null;
 
         if ($id == null){
-            http_response_code();
+            http_response_code(400);
             echo json_encode($response = [
-                'message' => 'ID not provided',
+                'error' => 'ID not provided',
             ]);
             break;
         }
@@ -27,25 +39,35 @@ switch ($_SERVER['REQUEST_METHOD']) {
         http_response_code($response['status']);
         echo json_encode($response['body']);
         break;
-    case 'POST':
-        $id = $_POST['id'] ?? null;
-        $response = [];
+    case 'GET workers':
+        $id = $segments[1] ?? null;
 
-        if ($id == null){
-            http_response_code();
+        if ($id == null) {
+            http_response_code(400);
             echo json_encode($response = [
-                'message' => 'ID not provided',
+                'error' => 'ID not provided',
             ]);
             break;
-        }       
+        }
 
-        $response = $controllerTask->getTask($_POST['id']);
+        $response = $controllerWorker->getWorker($id);
         http_response_code($response['status']);
         echo json_encode($response['body']);
         break;
     default:
-        http_response_code(405); //lado do cliente não do servidor por isso não pode ser 500
+        // rota existe, mas o método não é suportado -> 405
+        if ($resource === 'tasks') {
+            http_response_code(405);
+            header('Allow: GET');
+            echo json_encode([
+                'error' => 'Method not allowed'
+            ]);
+            break;
+        }
+
+        // rota não existe -> 404 (erro do cliente, por isso não é 500)
+        http_response_code(404);
         echo json_encode([
-            'error' => 'Method don\'t found'
-        ]);    
+            'error' => 'Route not found'
+        ]);
 }

@@ -17,8 +17,7 @@ try {
     header('Content-Type: application/json');
     echo json_encode([
         'error' => 'Database connection failed',
-        'code' => $e->getCode(),
-        'message' => $e->getMessage()
+        'code' => $e->getCode()
     ]);
     exit;
 }
