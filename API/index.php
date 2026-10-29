@@ -56,7 +56,7 @@ switch ($url) {
         break;
     default:
         // rota existe, mas o método não é suportado -> 405
-        if ($resource === 'tasks') {
+        if ($resource === 'tasks' || $resource === 'workers') {
             http_response_code(405);
             header('Allow: GET');
             echo json_encode([
