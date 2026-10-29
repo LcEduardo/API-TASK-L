@@ -3,14 +3,19 @@
 require __DIR__ . "/config/database.php";
 require __DIR__ . "/controller/ControllerTask.php";
 require __DIR__ . "/controller/ControllerWorker.php";
+require __DIR__ . "/controller/ControllerBoss.php";
 require __DIR__ . "/model/Tasks.php";
 require __DIR__ . "/model/Workers.php";
+require __DIR__ . "/model/Bosses.php";
 
 $Task = new Task($db);
 $controllerTask = new ControllerTask($Task);
 
 $Worker = new Worker($db);
 $controllerWorker = new ControllerWorker($Worker);
+
+$Boss = new Boss($db);
+$controllerBoss = new ControllerBoss($Boss);
 
 header('Content-Type: application/json');
 
@@ -54,6 +59,33 @@ switch ($url) {
         http_response_code($response['status']);
         echo json_encode($response['body']);
         break;
+    case 'POST tasks':
+        $workerId = $_POST['worker_id'] ?? null;
+        $bossId = $_POST['boss_id'] ?? null;
+        $title = $_POST['title'] ?? null;
+
+        // worker é opcional: só valida se foi enviado
+        $worker = null;
+        if ($workerId !== null && $workerId !== '') {
+            $worker = $controllerWorker->getWorker($workerId);
+        }
+
+        $boss = $controllerBoss->getBoss($bossId); // sempre retornar um array
+
+        if ($boss['status'] !== 200) {
+            http_response_code($boss['status']);
+            echo json_encode($boss['body']);
+            break;
+        } elseif ($worker !== null && $worker['status'] !== 200) {
+            http_response_code($worker['status']);
+            echo json_encode($worker['body']);
+            break;
+        }
+
+        $response = $controllerTask->createTask($worker['body'] ?? null, $boss['body'], $_POST['description'] ?? null, $title);
+        http_response_code($response['status']);
+        echo json_encode($response['body']);
+        exit;
     default:
         // rota existe, mas o método não é suportado -> 405
         if ($resource === 'tasks' || $resource === 'workers') {

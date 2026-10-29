@@ -10,6 +10,13 @@ class ControllerWorker
 
     public function getWorker($id) {
         try {
+
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+
+            if ($id === false) {
+                 throw new Exception("The worker_id isn't interger", 400);
+            }
+
             $worker = $this->worker->getWorkerById($id);
 
         }catch(PDOException $e) {

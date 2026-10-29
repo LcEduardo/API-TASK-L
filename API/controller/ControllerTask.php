@@ -29,4 +29,29 @@ class ControllerTask
             "body" => $task,
         ];
     }
+
+    public function createTask($worker, $boss, $description, $title) {
+        try {
+
+            $taskId = $this->task->createTask($worker['id'] ?? null, $boss['id'], $description, $title);
+
+            $task = $this->task->getTaskById($taskId);
+
+        }catch (Excpetion $e) {
+            return [
+                "status" => $e->getCode(),
+                "body" => ['error' => $e->getMessage()],
+            ];
+        }catch(Exception $e) {
+            return [
+                "status" => $e->getCode(),
+                "body" => ['error' => $e->getMessage()],
+            ];
+        }
+
+        return [
+            "status" => 201,
+            "body" => $task,
+        ];
+    }
 }
