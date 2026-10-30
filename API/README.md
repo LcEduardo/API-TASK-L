@@ -2,6 +2,8 @@
 
 API simples em PHP puro com PostgreSQL para consultar tarefas (`tasks`) e funcionários (`workers`).
 
+> Vai consumir a API? Veja o [Guia de uso da API](API.md), com as rotas, os campos e os erros.
+
 ## Estrutura
 
 ```
