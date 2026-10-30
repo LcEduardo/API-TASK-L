@@ -17,7 +17,7 @@ class ControllerWorker
                  throw new Exception("The worker_id isn't interger", 400);
             }
 
-            $worker = $this->worker->getWorkerById($id);
+            $worker = $this->worker->getById($id);
 
         }catch(PDOException $e) {
             return [
@@ -53,7 +53,7 @@ class ControllerWorker
 
             $workerId = $this->worker->registerWorker($name, $email);
 
-            $worker = $this->worker->getWorkerById($workerId);
+            $worker = $this->worker->getById($workerId);
 
         }catch(PDOException $e) {
             // 23505 = unique_violation (email já cadastrado)

@@ -4,6 +4,7 @@ require __DIR__ . "/config/database.php";
 require __DIR__ . "/controller/ControllerTask.php";
 require __DIR__ . "/controller/ControllerWorker.php";
 require __DIR__ . "/controller/ControllerBoss.php";
+require __DIR__ . "/model/Model.php";
 require __DIR__ . "/model/Tasks.php";
 require __DIR__ . "/model/Workers.php";
 require __DIR__ . "/model/Bosses.php";
@@ -59,6 +60,21 @@ switch ($url) {
         http_response_code($response['status']);
         echo json_encode($response['body']);
         break;
+    case 'GET bosses':
+        $id = $segments[1] ?? null;
+
+        if ($id == null) {
+            http_response_code(400);
+            echo json_encode($response = [
+                'error' => 'ID not provided',
+            ]);
+            break;
+        }
+
+        $response = $controllerBoss->getBoss($id);
+        http_response_code($response['status']);
+        echo json_encode($response['body']);
+        break;
     case 'POST tasks':
         $workerId = $_POST['worker_id'] ?? null;
         $bossId = $_POST['boss_id'] ?? null;
@@ -106,6 +122,7 @@ switch ($url) {
         $allowed = [
             'tasks'    => 'GET, POST',
             'workers'  => 'GET',
+            'bosses'   => 'GET',
             'register' => 'POST',
         ];
 

@@ -19,6 +19,7 @@ Este guia é para quem vai **consumir** a API (um front-end, um app, um parceiro
 | `POST` | `/tasks` | Cria uma task |
 | `GET` | `/workers/{id}` | Busca um funcionário pelo id |
 | `POST` | `/register/worker` | Cadastra um funcionário |
+| `GET` | `/bosses/{id}` | Busca um chefe pelo id |
 
 Não existe rota para listar todos os registros, nem para editar ou apagar.
 
@@ -141,7 +142,7 @@ Guarde o `id` da resposta se for consultar a task depois.
 
 Se `boss_id` e `worker_id` estiverem errados ao mesmo tempo, só o erro do `boss_id` é devolvido.
 
-> **Sempre envie `title`.** Hoje a API ainda não verifica esse campo antes de gravar. Sem ele, a task não é criada e a resposta de erro sai fora do padrão descrito acima.
+> **Sempre envie `title`.** Hoje a API ainda não verifica esse campo antes de gravar. Sem ele, a task não é criada e a resposta é `500` com `{"error": "Database error"}`, em vez de um `400` explicando o que faltou.
 
 ---
 
@@ -220,13 +221,45 @@ Se `name` e `email` estiverem errados ao mesmo tempo, só o erro do `name` é de
 
 ---
 
+## Bosses (chefes)
+
+### `GET /bosses/{id}`: buscar um chefe
+
+**Exemplo**
+
+```
+curl http://localhost:8000/bosses/1
+```
+
+**Resposta `200 OK`**
+
+```json
+{
+  "id": 1,
+  "name": "Fernando Alves",
+  "email": "fernando.alves@example.com",
+  "created": "2026-10-29 14:05:12.481203"
+}
+```
+
+**Possíveis erros**
+
+| Código | Quando | Corpo |
+|---|---|---|
+| `400` | O id não foi informado (`/bosses`) | `{"error": "ID not provided"}` |
+| `400` | O id não é um número inteiro | `{"error": "The boss_id isn't interger"}` |
+| `404` | Não existe chefe com esse id | `{"error": "Boss with id 99 not found"}` |
+| `500` | Falha no banco de dados | `{"error": "Database error"}` |
+
+---
+
 ## Erros gerais
 
 Valem para qualquer chamada:
 
 | Código | Quando | Corpo |
 |---|---|---|
-| `404` | A rota não existe (ex.: `/bosses`, `/projetos`, `/register/boss`) | `{"error": "Route not found"}` |
+| `404` | A rota não existe (ex.: `/projetos`, `/register/boss`) | `{"error": "Route not found"}` |
 | `405` | A rota existe, mas o método não é suportado (ex.: `DELETE /tasks/1`, `POST /workers`, `GET /register/worker`). O cabeçalho `Allow` diz quais métodos a rota aceita | `{"error": "Method not allowed"}` |
 | `500` | A API não conseguiu se conectar ao banco | `{"error": "Database connection failed", "code": ...}` |
 
@@ -246,5 +279,5 @@ Valem para qualquer chamada:
 
 - O corpo do `POST` precisa ser form-data ou x-www-form-urlencoded. JSON ainda não é aceito.
 - Em `GET /tasks/{id}`, um id que não é número devolve `500` em vez de `400`.
-- Criar uma task sem `title` não devolve uma mensagem de erro clara.
-- Ainda não há rotas para listar, editar ou apagar registros, nem para consultar ou cadastrar chefes.
+- Criar uma task sem `title` devolve `500 Database error` em vez de `400`.
+- Ainda não há rotas para listar, editar ou apagar registros, nem para cadastrar chefes.

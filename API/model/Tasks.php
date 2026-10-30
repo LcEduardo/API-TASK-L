@@ -1,13 +1,12 @@
 <?php
 
-class Task {
-    private PDO $conn;
+class Task extends Model{
 
-    public function __construct(PDO $conn) {
-        $this->conn = $conn;
+    protected function getTable(): string {
+        return 'tasks';
     }
 
-    public function getTaskById($id) {
+    public function getById($id) {
         // Unico select com JOIN pois é apenas uma consulta
         $stmt = $this->conn->prepare(
             "SELECT t.id, t.title, t.description, t.status, t.created, t.modified, w.name as \"worker\", b.name as \"boss\" FROM tasks t
@@ -26,7 +25,7 @@ class Task {
         
     }
 
-    public function createTask($workerId, $bossId, $description, $title): string {
+    public function createTask($workerId, $bossId, $description, $title): int {
         
         $stmt = $this->conn->prepare(
                 "INSERT INTO tasks (title, description, status, worker_id, boss_id)

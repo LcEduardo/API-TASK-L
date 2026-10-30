@@ -10,7 +10,7 @@ class ControllerTask
 
     public function getTask($id) {
         try {
-            $task = $this->task->getTaskById($id);
+            $task = $this->task->getById($id);
 
         }catch(PDOException $e) {
             return [
@@ -35,12 +35,12 @@ class ControllerTask
 
             $taskId = $this->task->createTask($worker['id'] ?? null, $boss['id'], $description, $title);
 
-            $task = $this->task->getTaskById($taskId);
+            $task = $this->task->getById($taskId);
 
-        }catch (Excpetion $e) {
+        }catch(PDOException $e) {
             return [
-                "status" => $e->getCode(),
-                "body" => ['error' => $e->getMessage()],
+                "status" => 500,
+                "body" => ['error' => 'Database error'],
             ];
         }catch(Exception $e) {
             return [

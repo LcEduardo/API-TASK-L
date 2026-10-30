@@ -17,7 +17,7 @@ class ControllerBoss
                  throw new Exception("The boss_id isn't interger", 400);
             }
 
-            $boss = $this->boss->getBossById($id);
+            $boss = $this->boss->getById($id);
 
         }catch(PDOException $e) {
             return [
