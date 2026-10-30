@@ -86,11 +86,32 @@ switch ($url) {
         http_response_code($response['status']);
         echo json_encode($response['body']);
         exit;
+    case 'POST register':
+        $type = $segments[1] ?? null; // /register/worker -> "worker"
+
+        if ($type !== 'worker') {
+            http_response_code(404);
+            echo json_encode([
+                'error' => 'Route not found'
+            ]);
+            break;
+        }
+
+        $response = $controllerWorker->createWorker($_POST['name'] ?? null, $_POST['email'] ?? null);
+        http_response_code($response['status']);
+        echo json_encode($response['body']);
+        break;
     default:
         // rota existe, mas o método não é suportado -> 405
-        if ($resource === 'tasks' || $resource === 'workers') {
+        $allowed = [
+            'tasks'    => 'GET, POST',
+            'workers'  => 'GET',
+            'register' => 'POST',
+        ];
+
+        if (isset($allowed[$resource])) {
             http_response_code(405);
-            header('Allow: GET');
+            header('Allow: ' . $allowed[$resource]);
             echo json_encode([
                 'error' => 'Method not allowed'
             ]);
