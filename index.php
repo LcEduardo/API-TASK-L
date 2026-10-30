@@ -20,8 +20,8 @@ $controllerBoss = new ControllerBoss($Boss);
 
 header('Content-Type: application/json');
 
-$base = dirname($_SERVER['SCRIPT_NAME']); // "/API" (pasta onde está o index.php)
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // /API/tasks/1
+$base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/'); // "" na raiz, ou "/subpasta" se o index.php estiver em uma
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // /tasks/1
 $path = substr($path, strlen($base)); // /tasks/1
 $segments = explode('/', trim($path, '/'));  // ["tasks"] ou ["tasks", "1"]
 $resource = $segments[0]; // "tasks"

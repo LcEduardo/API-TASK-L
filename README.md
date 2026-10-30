@@ -7,7 +7,7 @@ API simples em PHP puro com PostgreSQL para consultar tarefas (`tasks`) e funcio
 ## Estrutura
 
 ```
-API/
+.
 ├── index.php                  # Ponto de entrada e roteador: lê a URL e chama o controller certo
 ├── config/
 │   ├── database.php           # Conexão com o banco via PDO
@@ -24,7 +24,7 @@ API/
 
 1. Crie o banco `task` no PostgreSQL e execute `config/Schema.sql`.
 2. Ajuste as credenciais em `config/database.php`.
-3. Dentro da pasta `API`, suba o servidor embutido do PHP:
+3. Na raiz do projeto, suba o servidor embutido do PHP:
 
    ```
    php -S localhost:8000
