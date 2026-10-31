@@ -185,7 +185,7 @@ curl http://localhost:8000/workers/1
 | `name` | **sim** | texto, até 100 caracteres | Nome do funcionário |
 | `email` | **sim** | texto, até 150 caracteres | Email do funcionário. Precisa ser um email válido e não pode já estar cadastrado |
 
-Espaços no começo e no fim de `name` e `email` são removidos antes de gravar.
+Espaços no começo e no fim de `name` e `email` são removidos antes de gravar. O `email` é sempre gravado em minúsculo (`Maria@Example.com` vira `maria@example.com`), então o mesmo email com letras diferentes conta como já cadastrado.
 
 **Exemplo**
 
@@ -213,7 +213,9 @@ Guarde o `id` da resposta: ele é o `worker_id` usado em `POST /tasks`.
 | Código | Quando | Corpo |
 |---|---|---|
 | `400` | `name` não foi enviado ou está vazio | `{"error": "The name is required"}` |
+| `400` | `name` tem mais de 100 caracteres | `{"error": "The name must have at most 100 characters"}` |
 | `400` | `email` não foi enviado ou não é um email válido | `{"error": "The email isn't valid"}` |
+| `400` | `email` tem mais de 150 caracteres | `{"error": "The email must have at most 150 characters"}` |
 | `409` | Já existe um funcionário com esse email | `{"error": "Email already registered"}` |
 | `500` | Falha no banco de dados | `{"error": "Database error"}` |
 

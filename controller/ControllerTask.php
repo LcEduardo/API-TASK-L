@@ -33,6 +33,18 @@ class ControllerTask
     public function createTask($worker, $boss, $description, $title) {
         try {
 
+            // title[]=a chega como array; trim() em array lança TypeError (não é Exception)
+            if (($title !== null && !is_string($title)) || ($description !== null && !is_string($description))) {
+                throw new Exception("The title and description must be strings", 400);
+            }
+
+            // title=" " vira "" depois do trim, então conta como não enviado
+            $title = trim($title ?? '');
+
+            if ($title === '') {
+                throw new Exception("The title is required", 400);
+            }
+
             $taskId = $this->task->createTask($worker['id'] ?? null, $boss['id'], $description, $title);
 
             $task = $this->task->getById($taskId);
