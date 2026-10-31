@@ -72,7 +72,10 @@ class ControllerWorker
                 throw new Exception("The email must have at most 150 characters", 400);
             }
 
-            $workerId = $this->worker->registerWorker($name, $email);
+            $workerId = $this->worker->create([
+                'name'  => $name,
+                'email' => $email,
+            ]);
 
             $worker = $this->worker->getById($workerId);
 

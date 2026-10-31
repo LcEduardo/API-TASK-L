@@ -106,7 +106,11 @@ switch ($url) {
     case 'POST register':
         $type = $segments[1] ?? null; // /register/worker -> "worker"
 
-        if ($type !== 'worker') {
+        if ($type === 'worker') {
+            $response = $controllerWorker->createWorker($_POST['name'] ?? null, $_POST['email'] ?? null);
+        } elseif ($type === 'boss') {
+            $response = $controllerBoss->createBoss($_POST['name'] ?? null, $_POST['email'] ?? null);
+        } else {
             http_response_code(404);
             echo json_encode([
                 'error' => 'Route not found'
@@ -114,7 +118,6 @@ switch ($url) {
             break;
         }
 
-        $response = $controllerWorker->createWorker($_POST['name'] ?? null, $_POST['email'] ?? null);
         http_response_code($response['status']);
         echo json_encode($response['body']);
         break;

@@ -9,28 +9,55 @@ API simples em PHP puro com PostgreSQL para consultar tarefas (`tasks`) e funcio
 ```
 .
 ├── index.php                  # Ponto de entrada e roteador: lê a URL e chama o controller certo
+├── composer.json              # Configuração do autoload PSR-4
 ├── config/
 │   ├── database.php           # Conexão com o banco via PDO
 │   └── Schema.sql             # Tabelas workers, bosses e tasks + dados de exemplo
-├── controller/
+├── controller/                # namespace App\Controller
+│   ├── ControllerBoss.php     # Monta a resposta de bosses (corpo + status HTTP)
 │   ├── ControllerTask.php     # Monta a resposta de tasks (corpo + status HTTP)
 │   └── ControllerWorker.php   # Monta a resposta de workers (corpo + status HTTP)
-└── model/
-    ├── Tasks.php              # Consultas SQL de tasks
-    └── Workers.php            # Consultas SQL de workers
+└── model/                     # namespace App\Model
+    ├── Model.php              # Classe base com getById e create genéricos
+    ├── Boss.php               # Consultas SQL de bosses
+    ├── Task.php               # Consultas SQL de tasks
+    └── Worker.php             # Consultas SQL de workers
 ```
+
+## Autoload (Composer PSR-4)
+
+As classes são carregadas automaticamente pelo Composer, sem `require` manual. O `composer.json` liga cada namespace a uma pasta:
+
+| Namespace | Pasta |
+|---|---|
+| `App\Controller\` | `controller/` |
+| `App\Model\` | `model/` |
+
+Para uma classe nova ser encontrada:
+
+- o arquivo deve ter **o mesmo nome da classe** (`class Task` → `Task.php`);
+- o arquivo deve declarar o namespace da pasta (`namespace App\Model;`);
+- classes nativas do PHP usadas dentro do namespace precisam de `use` (`use PDO;`, `use Exception;`).
+
+Se você mudar o mapeamento no `composer.json`, rode `composer dump-autoload`.
 
 ## Como rodar
 
-1. Crie o banco `task` no PostgreSQL e execute `config/Schema.sql`.
-2. Ajuste as credenciais em `config/database.php`.
-3. Na raiz do projeto, suba o servidor embutido do PHP:
+1. Na raiz do projeto, instale o autoload (gera a pasta `vendor/`, que não vai para o git):
+
+   ```
+   composer install
+   ```
+
+2. Crie o banco `task` no PostgreSQL e execute `config/Schema.sql`.
+3. Ajuste as credenciais em `config/database.php`.
+4. Na raiz do projeto, suba o servidor embutido do PHP:
 
    ```
    php -S localhost:8000
    ```
 
-4. Teste:
+5. Teste:
    - `GET http://localhost:8000/tasks/1`
    - `GET http://localhost:8000/workers/1`
 

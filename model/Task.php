@@ -27,29 +27,6 @@ class Task extends Model{
         }
 
         return $task;
-        
-    }
 
-    public function createTask($workerId, $bossId, $description, $title): int {
-        
-        $stmt = $this->conn->prepare(
-                "INSERT INTO tasks (title, description, status, worker_id, boss_id)
-                VALUES(:title, :description, :status, :worker_id, :boss_id)
-                RETURNING id"
-            );
-
-        $createTask = $stmt->execute([
-            'title'       => $title,
-            'description' => $description,
-            'status'      => 'pending',   //default
-            'worker_id'   => $workerId,
-            'boss_id'     => $bossId,
-        ]);
-
-        if ($createTask === false) {
-            throw new Exception("The task was not created", 400);
-        }
-
-        return (int) $stmt->fetchColumn();
     }
 }

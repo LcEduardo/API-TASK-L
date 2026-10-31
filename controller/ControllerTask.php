@@ -51,7 +51,13 @@ class ControllerTask
                 throw new Exception("The title is required", 400);
             }
 
-            $taskId = $this->task->createTask($worker['id'] ?? null, $boss['id'], $description, $title);
+            $taskId = $this->task->create([
+                'title'       => $title,
+                'description' => $description,
+                'status'      => 'pending',   //default
+                'worker_id'   => $worker['id'] ?? null,
+                'boss_id'     => $boss['id'],
+            ]);
 
             $task = $this->task->getById($taskId);
 
