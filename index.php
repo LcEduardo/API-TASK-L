@@ -1,13 +1,14 @@
 <?php
 
+require __DIR__ . "/vendor/autoload.php";
 require __DIR__ . "/config/database.php";
-require __DIR__ . "/controller/ControllerTask.php";
-require __DIR__ . "/controller/ControllerWorker.php";
-require __DIR__ . "/controller/ControllerBoss.php";
-require __DIR__ . "/model/Model.php";
-require __DIR__ . "/model/Tasks.php";
-require __DIR__ . "/model/Workers.php";
-require __DIR__ . "/model/Bosses.php";
+
+use App\Controller\ControllerBoss;
+use App\Controller\ControllerTask;
+use App\Controller\ControllerWorker;
+use App\Model\Boss;
+use App\Model\Task;
+use App\Model\Worker;
 
 $Task = new Task($db);
 $controllerTask = new ControllerTask($Task);

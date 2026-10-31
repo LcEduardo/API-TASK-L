@@ -1,5 +1,10 @@
 <?php
 
+namespace App\Model;
+
+use Exception;
+use PDO;
+
 abstract class Model 
 {
     protected PDO $conn;

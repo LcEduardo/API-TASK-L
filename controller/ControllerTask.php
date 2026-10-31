@@ -1,5 +1,11 @@
 <?php
 
+namespace App\Controller;
+
+use App\Model\Task;
+use Exception;
+use PDOException;
+
 class ControllerTask 
 {
     private Task $task;

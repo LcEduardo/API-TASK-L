@@ -1,5 +1,11 @@
 <?php
 
+namespace App\Controller;
+
+use App\Model\Boss;
+use Exception;
+use PDOException;
+
 class ControllerBoss
 {
     private Boss $boss;

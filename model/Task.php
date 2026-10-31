@@ -1,5 +1,10 @@
 <?php
 
+namespace App\Model;
+
+use Exception;
+use PDO;
+
 class Task extends Model{
 
     protected function getTable(): string {

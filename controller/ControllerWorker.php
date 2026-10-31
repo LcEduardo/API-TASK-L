@@ -1,5 +1,11 @@
 <?php
 
+namespace App\Controller;
+
+use App\Model\Worker;
+use Exception;
+use PDOException;
+
 class ControllerWorker 
 {
     private Worker $worker;

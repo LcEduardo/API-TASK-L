@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Model;
+
+use Exception;
+
 class Worker extends Model {
     
     protected function getTable(): string {
