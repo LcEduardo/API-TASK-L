@@ -12,6 +12,7 @@ API simples em PHP puro com PostgreSQL para consultar tarefas (`tasks`) e funcio
 | PostgreSQL | qualquer versão atual | Banco `task` |
 | Composer | 2.x | Instala o autoload e o Phinx |
 | Phinx | 0.16 | Ferramenta de migrations, instalada pelo Composer |
+| PHPUnit | 12 | Testes automatizados, instalado pelo Composer (só em desenvolvimento) |
 
 Para conferir a versão do PHP e as extensões:
 
@@ -29,6 +30,9 @@ php -m
 ├── index.php                  # Ponto de entrada e roteador: lê a URL e chama o controller certo
 ├── composer.json              # Configuração do autoload PSR-4 e dependências (Phinx)
 ├── phinx.php                  # Configuração das migrations (conexão com o banco)
+├── phpunit.xml                # Configuração dos testes
+├── tests/                     # namespace Tests
+│   └── Unit/                  # Testes de unidade (não usam o banco)
 ├── db/
 │   ├── migrations/            # Migrations: cada arquivo é uma mudança no banco
 │   └── seeds/                 # Seeds: dados de exemplo
@@ -109,6 +113,26 @@ Regras para o dia a dia:
 - **Não edite uma migration que já rodou** em algum banco. Para corrigir algo, crie outra migration.
 - **Banco que já tinha as tabelas** (criadas antes das migrations): rode `php vendor/bin/phinx migrate --fake` uma vez. Isso marca a migration inicial como aplicada sem tentar criar as tabelas de novo.
 - **Rode `seed:run` só em banco vazio.** Os e-mails são únicos, então rodar de novo dá erro.
+
+## Testes (PHPUnit) e TDD
+
+Para rodar todos os testes:
+
+```
+composer test
+```
+
+Os testes ficam em `tests/`, espelhando as pastas do código: o teste de `controller/ControllerWorker.php` fica em `tests/Unit/Controller/ControllerWorkerTest.php`.
+
+- O nome do arquivo e da classe termina em `Test` e a classe estende `PHPUnit\Framework\TestCase`.
+- Cada método de teste começa com `test` e descreve o comportamento (`testGetWorkerReturns400WhenIdIsNotInteger`).
+- Testes de unidade **não usam o banco**: o model é trocado por um falso com `createStub` (só devolve valores) ou `createMock` (também confere se foi chamado).
+
+Fluxo do TDD, para cada comportamento novo:
+
+1. **Vermelho:** escreva um teste para o comportamento que ainda não existe e rode `composer test`. Ele deve falhar.
+2. **Verde:** escreva o mínimo de código para o teste passar.
+3. **Refatorar:** melhore o código sem mudar o comportamento, rodando os testes de novo para garantir que continuam passando.
 
 ## Papel de cada camada
 

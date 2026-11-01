@@ -12,9 +12,20 @@
             "App\\Model\\": "model/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "config": {
         "platform": {
             "php": "8.3.0"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "scripts": {
+        "test": "phpunit"
     }
 }
