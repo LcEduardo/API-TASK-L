@@ -9,7 +9,11 @@ API simples em PHP puro com PostgreSQL para consultar tarefas (`tasks`) e funcio
 ```
 .
 ├── index.php                  # Ponto de entrada e roteador: lê a URL e chama o controller certo
-├── composer.json              # Configuração do autoload PSR-4
+├── composer.json              # Configuração do autoload PSR-4 e dependências (Phinx)
+├── phinx.php                  # Configuração das migrations (conexão com o banco)
+├── db/
+│   ├── migrations/            # Migrations: cada arquivo é uma mudança no banco
+│   └── seeds/                 # Seeds: dados de exemplo
 ├── config/
 │   ├── database.php           # Conexão com o banco via PDO
 │   └── Schema.sql             # Tabelas workers, bosses e tasks + dados de exemplo
@@ -49,8 +53,13 @@ Se você mudar o mapeamento no `composer.json`, rode `composer dump-autoload`.
    composer install
    ```
 
-2. Crie o banco `task` no PostgreSQL e execute `config/Schema.sql`.
-3. Ajuste as credenciais em `config/database.php`.
+2. Crie o banco `task` no PostgreSQL e ajuste as credenciais em `config/database.php` e `phinx.php`.
+3. Crie as tabelas e insira os dados de exemplo:
+
+   ```
+   php vendor/bin/phinx migrate
+   php vendor/bin/phinx seed:run
+   ```
 4. Na raiz do projeto, suba o servidor embutido do PHP:
 
    ```
@@ -60,6 +69,16 @@ Se você mudar o mapeamento no `composer.json`, rode `composer dump-autoload`.
 5. Teste:
    - `GET http://localhost:8000/tasks/1`
    - `GET http://localhost:8000/workers/1`
+
+## Migrations (Phinx)
+
+| Comando | O que faz |
+|---|---|
+| `php vendor/bin/phinx create NomeDaMudanca` | Cria um arquivo de migration novo em `db/migrations/` |
+| `php vendor/bin/phinx migrate` | Aplica as migrations pendentes |
+| `php vendor/bin/phinx rollback` | Desfaz a última migration |
+| `php vendor/bin/phinx status` | Mostra quais migrations já rodaram |
+| `php vendor/bin/phinx seed:run` | Insere os dados de exemplo |
 
 ## Papel de cada camada
 
