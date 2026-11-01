@@ -4,6 +4,24 @@ API simples em PHP puro com PostgreSQL para consultar tarefas (`tasks`) e funcio
 
 > Vai consumir a API? Veja o [Guia de uso da API](API.md), com as rotas, os campos e os erros.
 
+## Requisitos
+
+| Ferramenta | Versão | Observação |
+|---|---|---|
+| PHP | **8.3 ou mais nova** (testado com 8.3 e 8.4) | Precisa das extensões `pdo_pgsql` e `pgsql` ativas |
+| PostgreSQL | qualquer versão atual | Banco `task` |
+| Composer | 2.x | Instala o autoload e o Phinx |
+| Phinx | 0.16 | Ferramenta de migrations, instalada pelo Composer |
+
+Para conferir a versão do PHP e as extensões:
+
+```
+php -v
+php -m
+```
+
+> **Por que 8.3?** O `composer.json` tem `"config": { "platform": { "php": "8.3.0" } }`. Isso faz o Composer escolher só pacotes que funcionam no PHP 8.3, mesmo que ele esteja rodando num PHP mais novo (ex.: 8.4 do Herd). Sem isso, ele poderia instalar pacotes que exigem 8.4 e o projeto quebraria em quem usa 8.3. Não remova essa configuração sem combinar com o time.
+
 ## Estrutura
 
 ```
@@ -15,8 +33,7 @@ API simples em PHP puro com PostgreSQL para consultar tarefas (`tasks`) e funcio
 │   ├── migrations/            # Migrations: cada arquivo é uma mudança no banco
 │   └── seeds/                 # Seeds: dados de exemplo
 ├── config/
-│   ├── database.php           # Conexão com o banco via PDO
-│   └── Schema.sql             # Tabelas workers, bosses e tasks + dados de exemplo
+│   └── database.php           # Conexão com o banco via PDO
 ├── controller/                # namespace App\Controller
 │   ├── ControllerBoss.php     # Monta a resposta de bosses (corpo + status HTTP)
 │   ├── ControllerTask.php     # Monta a resposta de tasks (corpo + status HTTP)
@@ -79,6 +96,19 @@ Se você mudar o mapeamento no `composer.json`, rode `composer dump-autoload`.
 | `php vendor/bin/phinx rollback` | Desfaz a última migration |
 | `php vendor/bin/phinx status` | Mostra quais migrations já rodaram |
 | `php vendor/bin/phinx seed:run` | Insere os dados de exemplo |
+
+Como funciona:
+
+- As configurações de conexão das migrations ficam em `phinx.php` (separadas de `config/database.php`, que é a conexão usada pela API). Se mudar as credenciais, mude nos dois arquivos.
+- O Phinx guarda na tabela `phinxlog` quais migrations já rodaram. Por isso `migrate` só aplica as que ainda faltam.
+- A primeira migration (`CreateInitialTables`) cria as tabelas `workers`, `bosses` e `tasks`.
+
+Regras para o dia a dia:
+
+- **Toda mudança no banco vira uma migration nova** (`phinx create`). Não altere as tabelas direto no banco.
+- **Não edite uma migration que já rodou** em algum banco. Para corrigir algo, crie outra migration.
+- **Banco que já tinha as tabelas** (criadas antes das migrations): rode `php vendor/bin/phinx migrate --fake` uma vez. Isso marca a migration inicial como aplicada sem tentar criar as tabelas de novo.
+- **Rode `seed:run` só em banco vazio.** Os e-mails são únicos, então rodar de novo dá erro.
 
 ## Papel de cada camada
 

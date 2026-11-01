@@ -3,7 +3,7 @@
     "description": "API de tarefas em PHP puro",
     "type": "project",
     "require": {
-        "php": ">=8.0",
+        "php": ">=8.3",
         "robmorgan/phinx": "^0.16.12"
     },
     "autoload": {
