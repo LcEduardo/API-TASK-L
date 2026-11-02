@@ -28,7 +28,9 @@ php -m
 ```
 .
 ├── index.php                  # Ponto de entrada e roteador: lê a URL e chama o controller certo
-├── composer.json              # Configuração do autoload PSR-4 e dependências (Phinx)
+├── composer.json              # Configuração do autoload PSR-4 e dependências (Phinx, phpdotenv)
+├── .env.example               # Modelo das variáveis de ambiente (copie para .env)
+├── .env                       # Suas credenciais do banco (NÃO vai para o git)
 ├── phinx.php                  # Configuração das migrations (conexão com o banco)
 ├── phpunit.xml                # Configuração dos testes
 ├── tests/                     # namespace Tests
@@ -74,7 +76,13 @@ Se você mudar o mapeamento no `composer.json`, rode `composer dump-autoload`.
    composer install
    ```
 
-2. Crie o banco `task` no PostgreSQL e ajuste as credenciais em `config/database.php` e `phinx.php`.
+2. Crie o banco `task` no PostgreSQL. Copie `.env.example` para `.env` e preencha suas credenciais:
+
+   ```
+   cp .env.example .env
+   ```
+
+   O `.env` está no `.gitignore`: a senha nunca vai para o repositório. Em produção, você pode definir as variáveis (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`) direto no servidor em vez de usar o arquivo. Se faltar alguma, a API responde 500 e o Phinx mostra qual variável está faltando.
 3. Crie as tabelas e insira os dados de exemplo:
 
    ```
@@ -103,7 +111,7 @@ Se você mudar o mapeamento no `composer.json`, rode `composer dump-autoload`.
 
 Como funciona:
 
-- As configurações de conexão das migrations ficam em `phinx.php` (separadas de `config/database.php`, que é a conexão usada pela API). Se mudar as credenciais, mude nos dois arquivos.
+- A API (`config/database.php`) e as migrations (`phinx.php`) leem as credenciais do mesmo `.env` (via `vlucas/phpdotenv`, que coloca as variáveis em `$_ENV`). Para mudar as credenciais, mude só o `.env`.
 - O Phinx guarda na tabela `phinxlog` quais migrations já rodaram. Por isso `migrate` só aplica as que ainda faltam.
 - A primeira migration (`CreateInitialTables`) cria as tabelas `workers`, `bosses` e `tasks`.
 
