@@ -44,6 +44,10 @@ php -m
 │   ├── ControllerBoss.php     # Monta a resposta de bosses (corpo + status HTTP)
 │   ├── ControllerTask.php     # Monta a resposta de tasks (corpo + status HTTP)
 │   └── ControllerWorker.php   # Monta a resposta de workers (corpo + status HTTP)
+├── soap/                      # namespace App\Soap (protocolo SOAP)
+│   ├── tasks.wsdl             # Contrato SOAP: operação getTask
+│   ├── TaskService.php        # Converte a resposta do ControllerTask em resposta SOAP / SoapFault
+│   └── server.php             # Endpoint SOAP (POST)
 └── model/                     # namespace App\Model
     ├── Model.php              # Classe base com getById e create genéricos
     ├── Boss.php               # Consultas SQL de bosses
@@ -98,6 +102,31 @@ Se você mudar o mapeamento no `composer.json`, rode `composer dump-autoload`.
 5. Teste:
    - `GET http://localhost:8000/tasks/1`
    - `GET http://localhost:8000/workers/1`
+
+## SOAP
+
+Além do REST/JSON, a operação `getTask` também está disponível via SOAP 1.1 (document/literal). Precisa da extensão `soap` ativa no `php.ini` (`extension=soap`).
+
+As chamadas são feitas via `POST http://localhost:8000/soap/server.php`. O contrato (WSDL) é o arquivo `soap/tasks.wsdl`.
+
+Requisição de exemplo (para Postman, SoapUI etc., com header `Content-Type: text/xml` e `SOAPAction: urn:TaskService#getTask`):
+
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="urn:TaskService">
+  <soapenv:Body>
+    <tns:getTask><tns:id>1</tns:id></tns:getTask>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
+
+Erros voltam como `SoapFault`:
+
+| faultcode | Quando |
+|---|---|
+| `Client` | id não é inteiro positivo, ou a task não existe |
+| `Server` | Falha no banco |
+
+Qualquer método que não seja POST (GET, PUT, DELETE...) recebe **405 Method Not Allowed**, com o header `Allow: POST` e um Fault `Client`.
 
 ## Migrations (Phinx)
 
