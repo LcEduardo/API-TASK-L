@@ -81,25 +81,20 @@ switch ($url) {
         $bossId = $_POST['boss_id'] ?? null;
         $title = $_POST['title'] ?? null;
 
-        // worker é opcional: só valida se foi enviado
-        $worker = null;
-        if ($workerId !== null && $workerId !== '') {
-            $worker = $controllerWorker->getWorker($workerId);
-        }
-
+        $worker = $controllerWorker->getWorker($workerId); // body null se o worker_id não foi enviado
         $boss = $controllerBoss->getBoss($bossId); // sempre retornar um array
 
         if ($boss['status'] !== 200) {
             http_response_code($boss['status']);
             echo json_encode($boss['body']);
             break;
-        } elseif ($worker !== null && $worker['status'] !== 200) {
+        } elseif ($worker['status'] !== 200) {
             http_response_code($worker['status']);
             echo json_encode($worker['body']);
             break;
         }
 
-        $response = $controllerTask->createTask($worker['body'] ?? null, $boss['body'], $_POST['description'] ?? null, $title);
+        $response = $controllerTask->createTask($worker['body'], $boss['body'], $_POST['description'] ?? null, $title);
         http_response_code($response['status']);
         echo json_encode($response['body']);
         exit;

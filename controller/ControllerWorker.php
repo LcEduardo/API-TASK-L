@@ -15,6 +15,14 @@ class ControllerWorker
     }
 
     public function getWorker($id) {
+        // worker é opcional: sem id não tem worker, então o body volta null
+        if ($id === null || $id === '') {
+            return [
+                "status" => 200,
+                "body" => null,
+            ];
+        }
+
         try {
 
             $id = filter_var($id, FILTER_VALIDATE_INT);

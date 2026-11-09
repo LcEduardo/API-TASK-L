@@ -35,6 +35,18 @@ final class ControllerWorkerTest extends TestCase
         $this->assertSame(400, $response['status']);
     }
 
+    public function testGetWorkerReturnsNullBodyWhenIdIsNotSent(): void
+    {
+        // sem worker_id não deve nem consultar o banco
+        $worker = $this->createMock(Worker::class);
+        $worker->expects($this->never())->method('getById');
+
+        $controller = new ControllerWorker($worker);
+
+        $this->assertSame(['status' => 200, 'body' => null], $controller->getWorker(null));
+        $this->assertSame(['status' => 200, 'body' => null], $controller->getWorker(''));
+    }
+
     public function testCreateWorkerSavesEmailInLowercase(): void
     {
         $worker = $this->createMock(Worker::class);
