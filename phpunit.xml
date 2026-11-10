@@ -16,8 +16,7 @@
     </testsuites>
     <source>
         <include>
-            <directory>controller</directory>
-            <directory>model</directory>
+            <directory>src</directory>
             <directory>soap</directory>
         </include>
     </source>

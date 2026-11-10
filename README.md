@@ -40,19 +40,20 @@ php -m
 │   └── seeds/                 # Seeds: dados de exemplo
 ├── config/
 │   └── database.php           # Conexão com o banco via PDO
-├── controller/                # namespace App\Controller
-│   ├── ControllerBoss.php     # Monta a resposta de bosses (corpo + status HTTP)
-│   ├── ControllerTask.php     # Monta a resposta de tasks (corpo + status HTTP)
-│   └── ControllerWorker.php   # Monta a resposta de workers (corpo + status HTTP)
 ├── soap/                      # namespace App\Soap (protocolo SOAP)
 │   ├── tasks.wsdl             # Contrato SOAP: operação getTask
 │   ├── TaskService.php        # Converte a resposta do ControllerTask em resposta SOAP / SoapFault
 │   └── server.php             # Endpoint SOAP (POST)
-└── model/                     # namespace App\Model
-    ├── Model.php              # Classe base com getById e create genéricos
-    ├── Boss.php               # Consultas SQL de bosses
-    ├── Task.php               # Consultas SQL de tasks
-    └── Worker.php             # Consultas SQL de workers
+└── src/
+    ├── Controller/            # namespace App\Controller
+    │   ├── ControllerBoss.php     # Monta a resposta de bosses (corpo + status HTTP)
+    │   ├── ControllerTask.php     # Monta a resposta de tasks (corpo + status HTTP)
+    │   └── ControllerWorker.php   # Monta a resposta de workers (corpo + status HTTP)
+    └── Model/                 # namespace App\Model
+        ├── Model.php              # Classe base com getById e create genéricos
+        ├── Boss.php               # Consultas SQL de bosses
+        ├── Task.php               # Consultas SQL de tasks
+        └── Worker.php             # Consultas SQL de workers
 ```
 
 ## Autoload (Composer PSR-4)
@@ -61,8 +62,8 @@ As classes são carregadas automaticamente pelo Composer, sem `require` manual. 
 
 | Namespace | Pasta |
 |---|---|
-| `App\Controller\` | `controller/` |
-| `App\Model\` | `model/` |
+| `App\Controller\` | `src/Controller/` |
+| `App\Model\` | `src/Model/` |
 
 Para uma classe nova ser encontrada:
 
@@ -159,7 +160,7 @@ Para rodar todos os testes:
 composer test
 ```
 
-Os testes ficam em `tests/`, espelhando as pastas do código: o teste de `controller/ControllerWorker.php` fica em `tests/Unit/Controller/ControllerWorkerTest.php`.
+Os testes ficam em `tests/`, espelhando as pastas do código: o teste de `src/Controller/ControllerWorker.php` fica em `tests/Unit/Controller/ControllerWorkerTest.php`.
 
 - O nome do arquivo e da classe termina em `Test` e a classe estende `PHPUnit\Framework\TestCase`.
 - Cada método de teste começa com `test` e descreve o comportamento (`testGetWorkerReturns400WhenIdIsNotInteger`).
