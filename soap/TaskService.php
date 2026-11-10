@@ -15,8 +15,10 @@ class TaskService
         $this->controllerTask = $controllerTask;
     }
 
-    // Em document/literal wrapped o SoapServer entrega o <getTask> como objeto ($params->id)
-    public function getTask($params): array {
+    // Em document/literal wrapped o SoapServer entrega o <getTask> como objeto ($params->id).
+    // Sem WSDL (rpc) ele entrega o <id> direto, e um <getTask/> vazio chama sem argumentos:
+    // o "= null" evita o ArgumentCountError e deixa a validação abaixo responder.
+    public function getTask($params = null): array {
         $id = is_object($params) ? ($params->id ?? null) : $params;
         $id = is_string($id) ? trim($id) : $id;
 
