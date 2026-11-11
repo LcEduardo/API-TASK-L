@@ -16,6 +16,13 @@ class ControllerTask
 
     public function getTask($id) {
         try {
+            // /tasks/avc chegaria no Postgres como erro de tipo (PDOException -> 500), então valida antes
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+
+            if ($id === false) {
+                throw new Exception("The task id isn't integer", 400);
+            }
+
             $task = $this->task->getById($id);
 
         }catch(PDOException $e) {
