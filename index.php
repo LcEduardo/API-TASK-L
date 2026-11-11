@@ -21,6 +21,17 @@ $controllerBoss = new ControllerBoss($Boss);
 
 header('Content-Type: application/json');
 
+function respond(int $status, $body): void {
+    http_response_code($status);
+    echo json_encode($body);
+}
+
+// id de /recurso/{id}, ou null se não foi enviado
+function routeId(array $segments): ?string {
+    $id = $segments[1] ?? null;
+    return ($id === null || $id === '') ? null : $id;
+}
+
 $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/'); // "" na raiz, ou "/subpasta" se o index.php estiver em uma
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // /tasks/1
 $path = substr($path, strlen($base)); // /tasks/1
@@ -32,49 +43,34 @@ $url = $_SERVER['REQUEST_METHOD'] . ' ' . $resource;
 
 switch ($url) {
     case 'GET tasks':
-        $id = $segments[1] ?? null;
-
-        if ($id == null){
-            http_response_code(400);
-            echo json_encode($response = [
-                'error' => 'ID not provided',
-            ]);
+        $id = routeId($segments);
+        if ($id === null) {
+            respond(400, ['error' => 'ID not provided']);
             break;
         }
 
         $response = $controllerTask->getTask($id);
-        http_response_code($response['status']);
-        echo json_encode($response['body']);
+        respond($response['status'], $response['body']);
         break;
     case 'GET workers':
-        $id = $segments[1] ?? null;
-
-        if ($id == null) {
-            http_response_code(400);
-            echo json_encode($response = [
-                'error' => 'ID not provided',
-            ]);
+        $id = routeId($segments);
+        if ($id === null) {
+            respond(400, ['error' => 'ID not provided']);
             break;
         }
 
         $response = $controllerWorker->getWorker($id);
-        http_response_code($response['status']);
-        echo json_encode($response['body']);
+        respond($response['status'], $response['body']);
         break;
     case 'GET bosses':
-        $id = $segments[1] ?? null;
-
-        if ($id == null) {
-            http_response_code(400);
-            echo json_encode($response = [
-                'error' => 'ID not provided',
-            ]);
+        $id = routeId($segments);
+        if ($id === null) {
+            respond(400, ['error' => 'ID not provided']);
             break;
         }
 
         $response = $controllerBoss->getBoss($id);
-        http_response_code($response['status']);
-        echo json_encode($response['body']);
+        respond($response['status'], $response['body']);
         break;
     case 'POST tasks':
         $workerId = $_POST['worker_id'] ?? null;
@@ -85,19 +81,16 @@ switch ($url) {
         $boss = $controllerBoss->getBoss($bossId); // sempre retornar um array
 
         if ($boss['status'] !== 200) {
-            http_response_code($boss['status']);
-            echo json_encode($boss['body']);
+            respond($boss['status'], $boss['body']);
             break;
         } elseif ($worker['status'] !== 200) {
-            http_response_code($worker['status']);
-            echo json_encode($worker['body']);
+            respond($worker['status'], $worker['body']);
             break;
         }
 
         $response = $controllerTask->createTask($worker['body'], $boss['body'], $_POST['description'] ?? null, $title);
-        http_response_code($response['status']);
-        echo json_encode($response['body']);
-        exit;
+        respond($response['status'], $response['body']);
+        break;
     case 'POST register':
         $type = $segments[1] ?? null; // /register/worker -> "worker"
 
@@ -106,15 +99,11 @@ switch ($url) {
         } elseif ($type === 'boss') {
             $response = $controllerBoss->createBoss($_POST['name'] ?? null, $_POST['email'] ?? null);
         } else {
-            http_response_code(404);
-            echo json_encode([
-                'error' => 'Route not found'
-            ]);
+            respond(404, ['error' => 'Route not found']);
             break;
         }
 
-        http_response_code($response['status']);
-        echo json_encode($response['body']);
+        respond($response['status'], $response['body']);
         break;
     default:
         // rota existe, mas o método não é suportado -> 405
@@ -126,17 +115,11 @@ switch ($url) {
         ];
 
         if (isset($allowed[$resource])) {
-            http_response_code(405);
             header('Allow: ' . $allowed[$resource]);
-            echo json_encode([
-                'error' => 'Method not allowed'
-            ]);
+            respond(405, ['error' => 'Method not allowed']);
             break;
         }
 
         // rota não existe -> 404 (erro do cliente, por isso não é 500)
-        http_response_code(404);
-        echo json_encode([
-            'error' => 'Route not found'
-        ]);
+        respond(404, ['error' => 'Route not found']);
 }
