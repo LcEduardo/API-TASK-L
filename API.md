@@ -79,8 +79,9 @@ curl http://localhost:8000/tasks/1
 | Código | Quando | Corpo |
 |---|---|---|
 | `400` | O id não foi informado (`/tasks`) | `{"error": "ID not provided"}` |
+| `400` | O id não é um número inteiro (ex.: `/tasks/abc`) | `{"error": "The task id isn't integer"}` |
 | `404` | Não existe task com esse id | `{"error": "Task with id 99 not found"}` |
-| `500` | Falha no banco de dados. Hoje isso também acontece se o id não for um número (ex.: `/tasks/abc`) | `{"error": "Database error"}` |
+| `500` | Falha no banco de dados | `{"error": "Database error"}` |
 
 ### `POST /tasks`: criar uma task
 
@@ -140,10 +141,13 @@ Guarde o `id` da resposta se for consultar a task depois.
 | `400` | `worker_id` foi enviado mas não é um número inteiro | `{"error": "The worker_id isn't interger"}` |
 | `404` | Não existe chefe com o `boss_id` informado | `{"error": "Boss with id 99 not found"}` |
 | `404` | Não existe funcionário com o `worker_id` informado | `{"error": "Worker with id 99 not found"}` |
+| `400` | `title` não foi enviado ou está vazio (só espaços também conta como vazio) | `{"error": "The title is required"}` |
+| `400` | `title` ou `description` não é texto (ex.: `title[]=a`) | `{"error": "The title and description must be strings"}` |
+| `500` | Falha no banco de dados | `{"error": "Database error"}` |
 
-Se `boss_id` e `worker_id` estiverem errados ao mesmo tempo, só o erro do `boss_id` é devolvido.
+Os campos são verificados nesta ordem: `boss_id`, `worker_id` e depois `title`/`description`. Só o primeiro erro encontrado é devolvido. Por exemplo, se `boss_id` e `title` estiverem errados ao mesmo tempo, só o erro do `boss_id` volta.
 
-> **Sempre envie `title`.** Hoje a API ainda não verifica esse campo antes de gravar. Sem ele, a task não é criada e a resposta é `500` com `{"error": "Database error"}`, em vez de um `400` explicando o que faltou.
+Espaços no começo e no fim de `title` são removidos antes de gravar.
 
 ---
 
@@ -306,6 +310,6 @@ Valem para qualquer chamada:
 ## Limitações atuais
 
 - O corpo do `POST` precisa ser form-data ou x-www-form-urlencoded. JSON ainda não é aceito.
-- Em `GET /tasks/{id}`, um id que não é número devolve `500` em vez de `400`.
-- Criar uma task sem `title` devolve `500 Database error` em vez de `400`.
-- Ainda não há rotas para listar, editar ou apagar registros, nem para cadastrar chefes.
+- Um `title` com mais de 150 caracteres devolve `500 Database error` em vez de `400`.
+- Um id muito grande (acima de 2147483647), em `GET /tasks/{id}`, `GET /workers/{id}`, `GET /bosses/{id}` ou no `boss_id`/`worker_id` de `POST /tasks`, devolve `500 Database error` em vez de `400`.
+- Ainda não há rotas para listar, editar ou apagar registros.
