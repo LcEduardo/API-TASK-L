@@ -18,9 +18,9 @@ Este guia é para quem vai **consumir** a API (um front-end, um app, um parceiro
 | `GET` | `/tasks/{id}` | Busca uma task pelo id |
 | `POST` | `/tasks` | Cria uma task |
 | `GET` | `/workers/{id}` | Busca um funcionário pelo id |
-| `POST` | `/register/worker` | Cadastra um funcionário |
+| `POST` | `/workers` | Cadastra um funcionário |
 | `GET` | `/bosses/{id}` | Busca um chefe pelo id |
-| `POST` | `/register/boss` | Cadastra um chefe |
+| `POST` | `/bosses` | Cadastra um chefe |
 
 Não existe rota para listar todos os registros, nem para editar ou apagar.
 
@@ -181,7 +181,7 @@ curl http://localhost:8000/workers/1
 | `404` | Não existe funcionário com esse id | `{"error": "Worker with id 99 not found"}` |
 | `500` | Falha no banco de dados | `{"error": "Database error"}` |
 
-### `POST /register/worker`: cadastrar um funcionário
+### `POST /workers`: cadastrar um funcionário
 
 **Campos do corpo**
 
@@ -195,7 +195,7 @@ Espaços no começo e no fim de `name` e `email` são removidos antes de gravar.
 **Exemplo**
 
 ```
-curl -X POST http://localhost:8000/register/worker   -d "name=Maria Oliveira"   -d "email=maria.oliveira@example.com"
+curl -X POST http://localhost:8000/workers   -d "name=Maria Oliveira"   -d "email=maria.oliveira@example.com"
 ```
 
 **Resposta `201 Created`**
@@ -258,14 +258,14 @@ curl http://localhost:8000/bosses/1
 | `404` | Não existe chefe com esse id | `{"error": "Boss with id 99 not found"}` |
 | `500` | Falha no banco de dados | `{"error": "Database error"}` |
 
-### `POST /register/boss`: cadastrar um chefe
+### `POST /bosses`: cadastrar um chefe
 
-Funciona igual ao `POST /register/worker`: mesmos campos (`name` até 100 caracteres, `email` válido até 150), mesmo tratamento de espaços e email em minúsculo, e os mesmos erros (`400`, `409`, `500`). Os emails de chefes e de funcionários são independentes: o mesmo email pode estar nas duas tabelas.
+Funciona igual ao `POST /workers`: mesmos campos (`name` até 100 caracteres, `email` válido até 150), mesmo tratamento de espaços e email em minúsculo, e os mesmos erros (`400`, `409`, `500`). Os emails de chefes e de funcionários são independentes: o mesmo email pode estar nas duas tabelas.
 
 **Exemplo**
 
 ```
-curl -X POST http://localhost:8000/register/boss   -d "name=Chefe Teste"   -d "email=chefe.teste@example.com"
+curl -X POST http://localhost:8000/bosses   -d "name=Chefe Teste"   -d "email=chefe.teste@example.com"
 ```
 
 **Resposta `201 Created`**
@@ -291,8 +291,8 @@ Valem para qualquer chamada:
 
 | Código | Quando | Corpo |
 |---|---|---|
-| `404` | A rota não existe (ex.: `/projetos`, `/register/admin`) | `{"error": "Route not found"}` |
-| `405` | A rota existe, mas o método não é suportado (ex.: `DELETE /tasks/1`, `POST /workers`, `GET /register/worker`). O cabeçalho `Allow` diz quais métodos a rota aceita | `{"error": "Method not allowed"}` |
+| `404` | A rota não existe (ex.: `/projetos`, `/register/worker`) | `{"error": "Route not found"}` |
+| `405` | A rota existe, mas o método não é suportado (ex.: `DELETE /tasks/1`, `PUT /workers/1`, `DELETE /bosses/1`). O cabeçalho `Allow` diz quais métodos a rota aceita | `{"error": "Method not allowed"}` |
 | `500` | A API não conseguiu se conectar ao banco | `{"error": "Database connection failed", "code": ...}` |
 
 ## Resumo dos códigos HTTP

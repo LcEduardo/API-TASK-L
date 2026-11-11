@@ -156,7 +156,7 @@ Fluxo do TDD, para cada comportamento novo:
 | 200 | OK | Registro encontrado |
 | 400 | Bad Request | O id não foi informado na URL (ex.: `/tasks`) |
 | 404 | Not Found | O id não corresponde a nenhum registro, ou a rota não existe |
-| 405 | Method Not Allowed | Método HTTP não suportado em `/tasks` ou `/workers` (ex.: `POST`) |
+| 405 | Method Not Allowed | Método HTTP não suportado em `/tasks`, `/workers` ou `/bosses` (ex.: `DELETE`) |
 | 500 | Internal Server Error | Falha na conexão ou na consulta ao banco |
 
 ## Próximos passos

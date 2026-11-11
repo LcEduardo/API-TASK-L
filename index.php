@@ -91,27 +91,20 @@ switch ($url) {
         $response = $controllerTask->createTask($worker['body'], $boss['body'], $_POST['description'] ?? null, $title);
         respond($response['status'], $response['body']);
         break;
-    case 'POST register':
-        $type = $segments[1] ?? null; // /register/worker -> "worker"
-
-        if ($type === 'worker') {
-            $response = $controllerWorker->createWorker($_POST['name'] ?? null, $_POST['email'] ?? null);
-        } elseif ($type === 'boss') {
-            $response = $controllerBoss->createBoss($_POST['name'] ?? null, $_POST['email'] ?? null);
-        } else {
-            respond(404, ['error' => 'Route not found']);
-            break;
-        }
-
+    case 'POST workers':
+        $response = $controllerWorker->createWorker($_POST['name'] ?? null, $_POST['email'] ?? null);
+        respond($response['status'], $response['body']);
+        break;
+    case 'POST bosses':
+        $response = $controllerBoss->createBoss($_POST['name'] ?? null, $_POST['email'] ?? null);
         respond($response['status'], $response['body']);
         break;
     default:
         // rota existe, mas o método não é suportado -> 405
         $allowed = [
             'tasks'    => 'GET, POST',
-            'workers'  => 'GET',
-            'bosses'   => 'GET',
-            'register' => 'POST',
+            'workers'  => 'GET, POST',
+            'bosses'   => 'GET, POST',
         ];
 
         if (isset($allowed[$resource])) {
