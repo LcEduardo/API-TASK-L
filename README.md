@@ -12,6 +12,7 @@ API simples em PHP puro com PostgreSQL para consultar tarefas (`tasks`) e funcio
 | PostgreSQL | qualquer versão atual | Banco `task` |
 | Composer | 2.x | Instala o autoload e o Phinx |
 | Phinx | 0.16 | Ferramenta de migrations, instalada pelo Composer |
+| phpdotenv | 5.6.1 ou mais nova (`^5.6`) | Lê o `.env`, instalado pelo Composer. Versões anteriores à 5.6.1 geram aviso de *Deprecated* no PHP 8.4 |
 | PHPUnit | 12 | Testes automatizados, instalado pelo Composer (só em desenvolvimento) |
 
 Para conferir a versão do PHP e as extensões:
