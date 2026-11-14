@@ -32,6 +32,12 @@ function routeId(array $segments): ?string {
     return ($id === null || $id === '') ? null : $id;
 }
 
+// O PHP só preenche $_POST no POST. No PUT o corpo (x-www-form-urlencoded) é lido direto de php://input.
+function requestBody(): array {
+    parse_str(file_get_contents('php://input'), $body);
+    return $body;
+}
+
 $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/'); // "" na raiz, ou "/subpasta" se o index.php estiver em uma
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // /tasks/1
 $path = substr($path, strlen($base)); // /tasks/1
@@ -99,12 +105,34 @@ switch ($url) {
         $response = $controllerBoss->createBoss($_POST['name'] ?? null, $_POST['email'] ?? null);
         respond($response['status'], $response['body']);
         break;
+    case 'PUT workers':
+        $id = routeId($segments);
+        if ($id === null) {
+            respond(400, ['error' => 'ID not provided']);
+            break;
+        }
+
+        $body = requestBody();
+        $response = $controllerWorker->updateWorker($id, $body['name'] ?? null, $body['email'] ?? null);
+        respond($response['status'], $response['body']);
+        break;
+    case 'PUT bosses':
+        $id = routeId($segments);
+        if ($id === null) {
+            respond(400, ['error' => 'ID not provided']);
+            break;
+        }
+
+        $body = requestBody();
+        $response = $controllerBoss->updateBoss($id, $body['name'] ?? null, $body['email'] ?? null);
+        respond($response['status'], $response['body']);
+        break;
     default:
         // rota existe, mas o método não é suportado -> 405
         $allowed = [
             'tasks'    => 'GET, POST',
-            'workers'  => 'GET, POST',
-            'bosses'   => 'GET, POST',
+            'workers'  => 'GET, POST, PUT',
+            'bosses'   => 'GET, POST, PUT',
         ];
 
         if (isset($allowed[$resource])) {

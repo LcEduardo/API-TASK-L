@@ -51,4 +51,20 @@ abstract class Model
 
         return (int) $stmt->fetchColumn();
     }
+
+    // Mesma regra do create(): as chaves de $data vêm do código, os valores vão pelo prepared statement.
+    public function update(int $id, array $data): void {
+        $sets = array_map(fn ($column) => "$column = :$column", array_keys($data));
+
+        $stmt = $this->conn->prepare(
+            "UPDATE " . $this->getTable() . " SET " . implode(', ', $sets) . " WHERE id = :id"
+        );
+
+        $stmt->execute($data + ['id' => $id]);
+
+        // nenhuma linha com esse id -> mesmo 404 do getById()
+        if ($stmt->rowCount() === 0) {
+            throw new Exception((new ReflectionClass($this))->getShortName() . " with id $id not found", 404);
+        }
+    }
 }
